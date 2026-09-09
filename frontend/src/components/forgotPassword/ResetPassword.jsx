@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useSearchParams, Link } from "react-router-dom";
 import axios from "../../Axios/axios.js";
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 function ResetPassword() {
     const [password, setPassword] = useState("");
@@ -9,6 +11,8 @@ function ResetPassword() {
     const [error, setError] = useState("");
     const [searchParams] = useSearchParams();
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -62,22 +66,42 @@ function ResetPassword() {
                 )}
 
                 <form onSubmit={handleSubmit}>
-                    <input
-                        type="password"
-                        className="w-full px-4 py-2.5 text-base text-gray-700 bg-white border border-gray-300 rounded-lg transition focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 mb-3"
-                        placeholder="Enter new password"
-                        onChange={(e) => setPassword(e.target.value)}
-                        value={password}
-                        required
-                    />
-                    <input
-                        type="password"
-                        className="w-full px-4 py-2.5 text-base text-gray-700 bg-white border border-gray-300 rounded-lg transition focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 mb-4"
-                        placeholder="Confirm new password"
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        value={confirmPassword}
-                        required
-                    />
+                    <div className="relative mb-3">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            className="w-full px-4 py-2.5 pr-11 text-base text-gray-700 bg-white border border-gray-300 rounded-lg transition focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
+                            placeholder="Enter new password"
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                            tabIndex="-1"
+                        >
+                            {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                        </button>
+                    </div>
+                    <div className="relative mb-4">
+                        <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            className="w-full px-4 py-2.5 pr-11 text-base text-gray-700 bg-white border border-gray-300 rounded-lg transition focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
+                            placeholder="Confirm new password"
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            value={confirmPassword}
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                            tabIndex="-1"
+                        >
+                            {showConfirmPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                        </button>
+                    </div>
                     <button
                         type="submit"
                         className="w-full py-2.5 rounded-lg shadow-md bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition disabled:opacity-50"

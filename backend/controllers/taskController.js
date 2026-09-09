@@ -6,20 +6,19 @@ dotenv.config();
 
 // Safe mail sending helper
 const sendMail = async (email, subject, title, description) => {
-    if (!process.env.GMAIL_USERNAME || !process.env.GMAIL_PASSWORD) {
+    const user = process.env.GMAIL_USERNAME?.trim();
+    const pass = process.env.GMAIL_PASSWORD?.trim();
+    if (!user || !pass) {
         return; // SMTP not configured, skip email quietly
     }
     try {
         const transporter = createTransport({
             service: 'gmail',
-            auth: {
-                user: process.env.GMAIL_USERNAME,
-                pass: process.env.GMAIL_PASSWORD
-            }
+            auth: { user, pass }
         });
 
         const mailOptions = {
-            from: `"Todo App" <${process.env.GMAIL_USERNAME}>`,
+            from: `"Todo App" <${user}>`,
             to: email,
             subject: subject,
             html: `<h1>Task added successfully</h1><h2>Title: ${title}</h2><h3>Description: ${description}</h3>`
@@ -48,6 +47,33 @@ const addTask = async (req, res) => {
         }
 
         return res.status(200).json({ message: "Task added successfully", task: savedTask });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+// Update / Edit Task
+const updateTask = async (req, res) => {
+    const id = req.body.id || req.params.id;
+    const { title, description } = req.body;
+    const userId = req.user.id;
+    try {
+        if (!id) {
+            return res.status(400).json({ message: "Task ID is required" });
+        }
+        if (!title || !description) {
+            return res.status(400).json({ message: "Title and description are required" });
+        }
+        const task = await taskModel.findOne({ _id: id, userId });
+        if (!task) {
+            return res.status(404).json({ message: "Task not found or unauthorized" });
+        }
+
+        task.title = title.trim();
+        task.description = description.trim();
+        const updatedTask = await task.save();
+
+        return res.status(200).json({ message: "Task updated successfully", task: updatedTask });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -103,4 +129,4 @@ const getTask = async (req, res) => {
     }
 };
 
-export { addTask, getTask, removeTask, markDone };
+export { addTask, getTask, removeTask, markDone, updateTask };

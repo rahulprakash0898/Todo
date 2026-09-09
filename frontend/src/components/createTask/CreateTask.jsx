@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import TaskContext from '../../context/TaskContext';
 import TokenContext from '../../context/TokenContext';
 import axios from "../../Axios/axios.js";
-import "./createTask.css";
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 function CreateTask() {
     const { dispatch } = useContext(TaskContext);
@@ -46,58 +46,67 @@ function CreateTask() {
             setDescription("");
         } catch (err) {
             console.error("Error adding task:", err);
-            setError(err.response?.data?.message || "Failed to add task");
+            setError(err.response?.data?.message || "Failed to add task. Please check connection.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="addContainer md:w-1/3 md:mx-auto mx-3 mt-3 flex justify-center">
-            <div className='w-11/12'>
-                <form onSubmit={handleAdd} className="bg-white p-5 rounded-lg shadow-md">
-                    <h3 className="text-xl font-bold mb-3 text-slate-800">Add New Task</h3>
+        <div className="w-full">
+            <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 text-white flex items-center gap-2">
+                    <AddCircleOutlineIcon />
+                    <h3 className="text-lg font-bold">Create New Task</h3>
+                </div>
+
+                <form onSubmit={handleAdd} className="p-6">
                     {error && (
-                        <div className="p-2 mb-3 text-sm text-red-700 bg-red-100 rounded">
+                        <div className="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-300">
                             {error}
                         </div>
                     )}
-                    <div className="mb-3">
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+
+                    <div className="mb-4">
+                        <label htmlFor="title" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                            Task Title
+                        </label>
                         <input
                             type="text"
                             name="title"
                             id="title"
                             value={title}
                             required
-                            placeholder="Task title..."
+                            placeholder="e.g., Complete project report"
                             onChange={(e) => setTitle(e.target.value)}
-                            className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
+                            className='w-full px-4 py-2.5 bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition outline-none'
                         />
                     </div>
-                    <div className='mb-4'>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+
+                    <div className='mb-5'>
+                        <label htmlFor="description" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                            Task Description
+                        </label>
                         <textarea
                             rows={4}
                             name="description"
                             id="description"
                             value={description}
                             required
-                            placeholder="Task details..."
+                            placeholder="Add details, notes, or subtasks..."
                             onChange={(e) => setDescription(e.target.value)}
                             style={{ resize: "none" }}
-                            className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5'
+                            className='w-full px-4 py-2.5 bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition outline-none'
                         />
                     </div>
-                    <div className='flex justify-end'>
-                        <button
-                            type='submit'
-                            disabled={loading}
-                            className='bg-blue-600 hover:bg-blue-700 transition text-white px-5 py-2 rounded-lg font-medium shadow-sm disabled:opacity-50'
-                        >
-                            {loading ? "Adding..." : "Add Task"}
-                        </button>
-                    </div>
+
+                    <button
+                        type='submit'
+                        disabled={loading}
+                        className='w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition duration-200 disabled:opacity-50 flex items-center justify-center gap-2 text-sm'
+                    >
+                        {loading ? "Adding..." : "+ Add Task"}
+                    </button>
                 </form>
             </div>
         </div>

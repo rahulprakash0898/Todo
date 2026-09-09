@@ -1,11 +1,14 @@
 import express from "express";
-import { addTask, getTask, removeTask, markDone } from "../controllers/taskController.js";
+import { addTask, getTask, removeTask, markDone, updateTask } from "../controllers/taskController.js";
 import requireAuth from "../middleware/requireAuth.js";
 
 const router = express.Router();
 
 router.post("/addTask", requireAuth, addTask);
 router.get("/getTask", requireAuth, getTask);
+router.post("/updateTask", requireAuth, updateTask);
+router.put("/updateTask", requireAuth, updateTask);
+router.put("/updateTask/:id", requireAuth, updateTask);
 router.post("/removeTask", requireAuth, removeTask);
 router.delete("/removeTask", requireAuth, removeTask);
 router.delete("/removeTask/:id", requireAuth, removeTask);

@@ -2,12 +2,16 @@ import React, { useState, useContext } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import axios from "../Axios/axios.js";
 import TokenContext from '../context/TokenContext.js';
+import loginIllustration from '../assets/login-illustration.svg';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 function Login() {
     const [formData, setFormData] = useState({});
     const { userToken, tokenDispatch, userDispatch } = useContext(TokenContext);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -33,16 +37,16 @@ function Login() {
     };
 
     return (
-        <div>
+        <div className="min-h-[calc(100vh-70px)] flex items-center justify-center py-10 bg-slate-100">
             {userToken && <Navigate to="/" />}
-            <section className="login-container py-10">
+            <section className="login-container w-full">
                 <div className="container mx-auto px-6 h-full text-gray-800">
                     <div className="flex xl:justify-center lg:justify-between justify-center items-center flex-wrap h-full g-6">
-                        <div className="grow-0 shrink-1 md:shrink-0 basis-auto xl:w-5/12 lg:w-5/12 md:w-8/12 mb-12 md:mb-0">
-                            <img src="/login-illustration.svg" className="w-full max-w-md mx-auto" alt="Login Illustration" />
+                        <div className="grow-0 shrink-1 md:shrink-0 basis-auto xl:w-5/12 lg:w-5/12 md:w-8/12 mb-12 md:mb-0 text-center">
+                            <img src={loginIllustration} className="w-full max-w-md mx-auto drop-shadow-md" alt="Login Illustration" />
                         </div>
                         <div className="xl:ml-20 xl:w-5/12 lg:w-5/12 md:w-8/12 mb-12 md:mb-0">
-                            <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
+                            <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-xl border border-slate-200">
                                 <h2 className="text-2xl font-bold text-slate-800 mb-6">Welcome Back</h2>
                                 {error && (
                                     <div className="text-center p-3 mb-4 rounded-lg bg-red-100 border border-red-300 text-red-700 text-sm font-medium">
@@ -61,17 +65,27 @@ function Login() {
                                         id="emailInput"
                                         placeholder="name@example.com" />
                                 </div>
-                                {/* Password input */}
+                                {/* Password input with Eye Toggle */}
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                                    <input
-                                        type="password"
-                                        name='password'
-                                        required
-                                        onChange={handleChange}
-                                        className="form-control block w-full px-4 py-2.5 text-base text-gray-700 bg-white border border-gray-300 rounded-lg transition focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
-                                        id="passInput"
-                                        placeholder="••••••••" />
+                                    <div className="relative">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            name='password'
+                                            required
+                                            onChange={handleChange}
+                                            className="form-control block w-full px-4 py-2.5 pr-11 text-base text-gray-700 bg-white border border-gray-300 rounded-lg transition focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
+                                            id="passInput"
+                                            placeholder="••••••••" />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                                            tabIndex="-1"
+                                        >
+                                            {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="flex justify-end items-center mb-6">
                                     <Link

@@ -18,6 +18,19 @@ function taskReducer(tasks, action) {
         case "SET_TASK": {
             return Array.isArray(action.payload) ? action.payload : [];
         }
+        case "UPDATE_TASK": {
+            return tasks.map((task, index) => {
+                const isMatch = (action.id && task._id) ? (task._id === action.id) : (index === action.index);
+                if (isMatch) {
+                    return {
+                        ...task,
+                        title: action.title !== undefined ? action.title : task.title,
+                        description: action.description !== undefined ? action.description : task.description
+                    };
+                }
+                return task;
+            });
+        }
         case "REMOVE_TASK": {
             return tasks.filter((task, index) => {
                 if (action.id && task._id) {
