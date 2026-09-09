@@ -18,7 +18,7 @@ const loginUser = async (req, res) => {
         if (!email || !password) {
             return res.status(400).json({ message: "Please enter all fields" });
         }
-        const user = await userModel.findOne({ email });
+        const user = await userModel.findOne({ email: email.toLowerCase().trim() });
 
         if (!user) {
             return res.status(400).json({ message: "User does not exist" });
@@ -47,17 +47,18 @@ const registerUser = async (req, res) => {
         if (!name || !email || !password) {
             return res.status(400).json({ message: "Please enter all fields" });
         }
-        if (validator.isEmpty(name.trim()) || validator.isEmpty(email.trim()) || validator.isEmpty(password.trim())) {
+        if (validator.isEmpty(name.trim()) || validator.isEmpty(email.trim()) || validator.isEmpty(password)) {
             return res.status(400).json({ message: "Please enter all fields" });
         }
-        if (!validator.isEmail(email)) {
-            return res.status(400).json({ message: "Please enter a valid email" });
+        if (!validator.isEmail(email.trim())) {
+            return res.status(400).json({ message: "Please enter a valid email address" });
         }
-        if (!validator.isStrongPassword(password)) {
-            return res.status(400).json({ message: "Please enter a strong password (min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 symbol)" });
+        if (password.length < 6) {
+            return res.status(400).json({ message: "Password must be at least 6 characters long" });
         }
 
-        const exists = await userModel.findOne({ email });
+        const normalizedEmail = email.toLowerCase().trim();
+        const exists = await userModel.findOne({ email: normalizedEmail });
         if (exists) {
             return res.status(400).json({ message: "User already exists with this email" });
         }
@@ -65,7 +66,7 @@ const registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new userModel({ name, email, password: hashedPassword });
+        const newUser = new userModel({ name: name.trim(), email: normalizedEmail, password: hashedPassword });
         const user = await newUser.save();
         const token = createToken(user._id);
         const userResponse = {
