@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import axios from "../../Axios/axios.js";
 
 function ResetPassword() {
@@ -8,65 +8,91 @@ function ResetPassword() {
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const [searchParams] = useSearchParams();
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true)
+        setIsLoading(true);
         setMessage("");
         setError("");
+
         if (password !== confirmPassword) {
             setError("Passwords do not match");
-            setIsLoading(false)
-        } else {
-            try {
-                const token = searchParams.get("token");
-                const res = await axios.post("/forgotPassword/resetPassword", {token, password })
-                setMessage(res.data.message);
-            } catch (error) {
-                setError(error.response.data.message)
-            }finally{
-                setIsLoading(false)
-            }
-           
+            setIsLoading(false);
+            return;
         }
-    }
+
+        try {
+            const token = searchParams.get("token");
+            if (!token) {
+                setError("Reset token is missing or invalid in URL.");
+                setIsLoading(false);
+                return;
+            }
+            const res = await axios.post("/forgotPassword/resetPassword", { token, password });
+            setMessage(res.data?.message || "Password reset successful!");
+        } catch (err) {
+            console.error("Reset password error:", err);
+            const errMsg = err.response?.data?.message || err.message || "Failed to reset password. Token may be expired.";
+            setError(errMsg);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
-        <div className='text-center'>
-            <h1 className='text-xl font-bold p-5'>Reset Password</h1>
-            <form className="w-2/5 mx-auto p-5" onSubmit={handleSubmit}>
-                <input type="password"
-                    className="p-3 rounded-md shadow-lg w-full my-4"
-                    placeholder="Enter new password"
-                    onChange={(e) => setPassword(e.target.value)}
-                    value={password}
-                    required
-                    autoComplete='false'
-                />
-                <input type="password"
-                    className="p-3 rounded-md shadow-lg w-full my-4"
-                    placeholder="Confirm new password"
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    value={confirmPassword}
-                    required
-                    autoComplete={false}
-                />
-                <button className="p-2 rounded-md shadow-md bg-indigo-700 text-white px-5 mt-10 disabled:bg-indigo-400" disabled={isLoading}>Reset</button>
-            </form>
-            {
-                message && <div className='mt-10 bg-green-700 mx-auto w-2/5 p-3 rounded-lg shadow-lg text-white text-lg'>
-                    <p>
+        <div className="py-12 px-4 max-w-md mx-auto">
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 text-center">
+                <h2 className="text-2xl font-bold text-slate-800 mb-2">Reset Password</h2>
+                <p className="text-sm text-slate-500 mb-6">Enter your new secure password below.</p>
+
+                {message && (
+                    <div className='p-3 mb-4 rounded-lg bg-green-100 border border-green-300 text-green-700 text-sm font-medium'>
                         {message}
-                    </p>
-                </div>
-            }
-            {
-                error && <div className='mt-10 bg-red-700 mx-auto w-2/5 p-3 rounded-lg shadow-lg text-white text-lg'>
-                    <p>
+                        <div className="mt-2">
+                            <Link to="/login" className="font-semibold underline">Go to Login</Link>
+                        </div>
+                    </div>
+                )}
+
+                {error && (
+                    <div className='p-3 mb-4 rounded-lg bg-red-100 border border-red-300 text-red-700 text-sm font-medium'>
                         {error}
-                    </p>
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="password"
+                        className="w-full px-4 py-2.5 text-base text-gray-700 bg-white border border-gray-300 rounded-lg transition focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 mb-3"
+                        placeholder="Enter new password"
+                        onChange={(e) => setPassword(e.target.value)}
+                        value={password}
+                        required
+                    />
+                    <input
+                        type="password"
+                        className="w-full px-4 py-2.5 text-base text-gray-700 bg-white border border-gray-300 rounded-lg transition focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 mb-4"
+                        placeholder="Confirm new password"
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        value={confirmPassword}
+                        required
+                    />
+                    <button
+                        type="submit"
+                        className="w-full py-2.5 rounded-lg shadow-md bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm transition disabled:opacity-50"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Resetting..." : "Reset Password"}
+                    </button>
+                </form>
+
+                <div className="mt-6 text-sm">
+                    <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+                        ← Back to Login
+                    </Link>
                 </div>
-            }
+            </div>
         </div>
     );
 }
